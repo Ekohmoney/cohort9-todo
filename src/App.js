@@ -1,13 +1,16 @@
-import { createContext, useEffect, useRef } from "react";
+import { createContext, useEffect } from "react";
 import "./App.css";
 import { useState } from "react";
 import Todos from "./components/Todos";
 import TodoInput from "./components/TodoInput";
+import Completed from "./components/Completed";
+import Uncompleted from "./components/Uncompleted";
 export const todosContext = createContext();
 function App() {
   const [todos, setTodos] = useState([]);
+  const [title, setTitle] = useState("");
   const [editId, setEditId] = useState(null);
-  const todoRef = useRef(null);
+  const [tabId, setTabId] = useState(1);
 
   useEffect(() => {
     let canceled = false;
@@ -46,9 +49,7 @@ function App() {
 
   const handleCreate = (e) => {
     e.preventDefault();
-    setTodos([
-      ...todos,
-      { title: todoRef.current.value, completed: false, id: todos.length + 1 },
+    setTodos ([...todos,{ title: title, completed: false, id: todos.length + 1 },
     ]);
   };
 
@@ -57,7 +58,8 @@ function App() {
       value={{
         todos,
         editId,
-        todoRef,
+        title,
+        setTitle,
         handleCheck,
         handleDelete,
         handleEdit,
@@ -69,8 +71,49 @@ function App() {
         <div className="todo-create">
           <TodoInput />
         </div>
+
+        <div className="flex justify-center mt-8">
+          <div className="flex bg-gray-100 hover:bg-gray-200 rounded-lg transition p-1">
+            <nav
+              className="flex space-x-2 text-black"
+              aria-label="Tabs"
+              role="tablist"
+            >
+              <button
+                type="button"
+                className={`py-3 px-4 inline-flex items-center gap-2 ${
+                  tabId === 1 ? "bg-white" : "bg-transparent"
+                } text-sm text-black hover:text-gray-700 font-medium rounded-md hover:hover:text-blue-600`}
+                onClick={() => setTabId(1)}
+              >
+                All
+              </button>
+              <button
+                type="button"
+                className={`py-3 px-4 inline-flex items-center gap-2 ${
+                  tabId === 2 ? "bg-white" : "bg-transparent"
+                } text-sm text-black hover:text-gray-700 font-medium rounded-md hover:hover:text-blue-600`}
+                onClick={() => setTabId(2)}
+              >
+                Completed
+              </button>
+              <button
+                type="button"
+                className={`py-3 px-4 inline-flex items-center gap-2 ${
+                  tabId === 3 ? "bg-white" : "bg-transparent"
+                } text-sm text-black hover:text-gray-700 font-medium rounded-md hover:hover:text-blue-600`}
+                onClick={() => setTabId(3)}
+              >
+                Uncompleted
+              </button>
+            </nav>
+          </div>
+        </div>
+
         <div className="todo-wrapper">
-          <Todos />
+          {tabId === 1 && <Todos />}
+          {tabId === 2 && <Completed />}
+          {tabId === 3 && <Uncompleted />}
         </div>
       </div>
     </todosContext.Provider>
